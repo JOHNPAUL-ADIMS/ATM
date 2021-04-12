@@ -20,6 +20,8 @@ database2 = {}
 
 def generateAccountNumber ():
     return random.randrange(1111111111,9999999999)
+
+
 def initalization():
     print("Welcome to the BANK OF JP".center(10, '*').upper())
     print("""
@@ -71,9 +73,10 @@ def registeration():
 def login():
     print("***************Login to your new account***************")
     userAccountNumber = int(input("Enter your account number \n"))
-    password = input("Enter your password\n")
+    isLoginNumberValidation = loginNumberValidation(userAccountNumber)
 
-    try:
+    if isLoginNumberValidation:
+        password = input("Enter your password\n")
 
         for accountNumber, userDetails in database.items():
             if (userAccountNumber == accountNumber):
@@ -89,11 +92,28 @@ def login():
                 else:
                     print("Invalid account or password, Enter your correct account Number")
                     login()
-        # print('Invalid account or password')
-        # login()
-    except ValueError:
-        print('Invalid option: Try again later')
-    return login()
+            # print('Invalid account or password')
+            else:
+                login()
+    else:
+        login()
+
+
+
+def loginNumberValidation(accountNumber):
+    if accountNumber:
+        if len(str(accountNumber)) == 10:
+
+            try:
+                int(accountNumber)
+            except ValueError:
+                print("Invalid Account Number, account number should be an integer")
+                return False
+            except TypeError:
+                print ("Invalid Account Number")
+    else:
+        print("Account Number is a required filled")
+        return False
 
 
 def bankingOperation(user):
