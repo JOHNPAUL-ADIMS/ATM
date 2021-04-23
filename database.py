@@ -8,10 +8,13 @@
 #search for user
 import os #allows us to delete a file
 import validation
+
+
+
 userdatabasepath = "data/userRecord/"
 
 
-def create(userAccountNumber, firstName, lastName, email, password):
+def create(userAccountNumber, firstName, lastName, email, password, bal):
     #create a file
     #name of file would be accountnumber.txt
     # add the user details to the file
@@ -19,7 +22,8 @@ def create(userAccountNumber, firstName, lastName, email, password):
     # if saving to  file, delete th file
 
 
-    userData = firstName + "," + lastName + "," + email + "," + password + "," + str(0)
+    userData = firstName + "," + lastName + "," + email + "," + password + "," + str(bal)
+
     if doesAccountNumberExist(userAccountNumber):
         return False
 
@@ -52,38 +56,70 @@ def create(userAccountNumber, firstName, lastName, email, password):
 def read(userAccountNumber):
     
     isLoginNumberValidation = validation.loginNumberValidation(userAccountNumber)
+
+    fx = open(userdatabasepath + userAccountNumber + ".txt", 'r')
+
+    user_info = fx.readline().split(",")
+
+    fx.close()
+
+    return user_info
+
+
+def update(userAccountNumber, op, amount):
+
+    fname = read(userAccountNumber)[0]
+    lname = read(userAccountNumber)[1]
+    email = read(userAccountNumber)[2]
+    pword = read(userAccountNumber)[3]
+    current_amount = int(read(userAccountNumber)[-1])
+
     
-    try:
-        if isLoginNumberValidation:
-            f = open(userdatabasepath + str(userAccountNumber) + '.txt', 'r')
-        else:
-            f = open(userdatabasepath + userAccountNumber, "r")
-        # r is for read while x is for open
-            
-    except FileNotFoundError:
-        print("user not found")
 
-    except FileExistsError:
-        print("User does not exist")
-    except TypeError:
-        print("Invalid account Number Format")
+    if op == 'deposit':
+
+        current_amount += int(amount)
+
+        data = f"{fname},{lname},{email},{pword},{current_amount}"
+
+        f = open(userdatabasepath + str(userAccountNumber) + '.txt', 'w')
+
+        f.write(data)
+
+        print(f"Your Current Balance is:\t#{current_amount}")
+
+        f.close()
+
+
+        return True
+
+    elif op == 'withdraw' or op == 'transfer':
+
+        current_amount -= int(amount)
+
+        data = f"{fname},{lname},{email},{pword},{current_amount}"
+
+        f = open(userdatabasepath + str(userAccountNumber) + '.txt', 'w')
+
+        f.write(data)
+
+        print(f"Your Current Balance is:\t#{current_amount}")
+
+        f.close()
+
+
+        return True
+
     else:
-        return  f.readline()
-    return False
-
-    # find user with the account
-    # fetch content of the file
+        return "Unknown Action"
 
 
-def update(userAccountNumber):
-    print()
+
     # find the user account number
     # fetch the content of the file 
     # update the content of the flile
     # save the file
     # return true
-
-
 
 def delete(userAccountNumber):
     # print("Delete user account")
@@ -132,11 +168,24 @@ def doesAccountNumberExist(accountNumber):
 def authenticateUser(accountNumber, password):
 
     if doesAccountNumberExist(accountNumber):
-        user = str.split(read(accountNumber), ',')
 
-        if password == user[3]:
-            return user 
-    return False
+        f = open(userdatabasepath+accountNumber+".txt", 'r')
+
+        deets = f.readline()
+
+        user_deets = deets.split(",")
+        
+        if int(password) == int(user_deets[3]):
+
+            return True
+
+            f.close()
+
+        else:
+
+            return False
+
+            f.close()
     
 
 
